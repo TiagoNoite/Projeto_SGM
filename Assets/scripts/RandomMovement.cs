@@ -3,25 +3,31 @@ using System.Collections;
 
 public class MovimentoAleatorio : MonoBehaviour
 {
-    public Transform pontoA; // Primeiro ponto de destino
-    public Transform pontoB; // Segundo ponto de destino
-    public Transform pontoC; // Terceiro ponto de destino
-    public float velocidade = 2.0f; // Velocidade de movimento do personagem
-    public float velocidadeRotacao = 5.0f; // Velocidade da rotação do personagem
-    private Transform destinoAtual; // Ponto para onde o personagem está se movendo
-    private bool esperando = false; // Verifica se está esperando
-    private Animator animator; // Referência ao Animator
-    private bool noPontoC = false; // Verifica se está no ponto C
-    private bool podeMover = false; // Controla quando a personagem pode se mover
+    public Transform pontoA;
+    public Transform pontoB;
+    public Transform pontoC;
+    public Transform looking;
+    public float velocidade = 2.0f;
+    public float velocidadeRotacao = 5.0f;
+    private Transform destinoAtual;
+    private bool noPontoC = false;
+    private bool podeMover = false;
+    public string tagDoFilho = "chat";
+
+    private Animator animator;
+    private ChatBubble chatBubble;
 
     void Start()
     {
-        // Referência ao componente Animator anexado ao personagem
-        animator = GetComponent<Animator>();
+        chatBubble = GetComponentInChildren<ChatBubble>();
 
-        // Começa movendo para o ponto A
+        if (chatBubble == null)
+        {
+            Debug.LogError("ChatBubble não encontrado para o cliente!");
+        }
+
+        animator = GetComponent<Animator>();
         destinoAtual = pontoA;
-        // Define que o personagem pode se mover inicialmente
         podeMover = true;
     }
 
@@ -29,64 +35,111 @@ public class MovimentoAleatorio : MonoBehaviour
     {
         if (podeMover && !noPontoC)
         {
-            // Move o personagem em direção ao destino atual
-            transform.position = Vector3.MoveTowards(transform.position, destinoAtual.position, velocidade * Time.deltaTime);
+            MoverParaDestino();
+        }
 
-            // Atualiza o parâmetro do Animator para "andar"
-            animator.SetBool("isWalking", true);
+        if (noPontoC)
+        {
+            
+            chatBubble = GetComponentInChildren<ChatBubble>();
 
-            // Rotaciona o personagem na direção do movimento
-            Vector3 direcao = (destinoAtual.position - transform.position).normalized;
-            if (direcao != Vector3.zero)
+            GirarParaOlhar(looking);
+
+            if (chatBubble.GetTempo() >= chatBubble.Getduracao())
             {
-                Quaternion rotacaoAlvo = Quaternion.LookRotation(direcao);
-                transform.rotation = Quaternion.Slerp(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
-            }
-
-            // Verifica se o personagem chegou no destino
-            if (Vector3.Distance(transform.position, destinoAtual.position) < 0.1f)
-            {
-                // Verifica se o destino é o ponto C
-                if (destinoAtual == pontoC)
-                {
-                    // Fica indefinidamente no ponto C
-                    noPontoC = true;
-                    animator.SetBool("isWalking", false);
-                }
-                else
-                {
-                    // Inicia a espera antes de definir o próximo destino
-                    StartCoroutine(EsperarNoDestino());
-                }
-                // Para o movimento enquanto espera
-                podeMover = false;
+                Debug.Log("passou por aqui e vai sair so pode apareceu um ");
+                ResetarCliente();
             }
         }
     }
 
+    private void MoverParaDestino()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, destinoAtual.position, velocidade * Time.deltaTime);
+        animator.SetBool("isWalking", true);
+
+        Vector3 direcao = (destinoAtual.position - transform.position).normalized;
+        if (direcao != Vector3.zero)
+        {
+            Quaternion rotacaoAlvo = Quaternion.LookRotation(direcao);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
+        }
+
+        if (Vector3.Distance(transform.position, destinoAtual.position) < 0.1f)
+        {
+            if (destinoAtual == pontoC)
+            {
+                noPontoC = true;
+                AtivarFilhoPorTag();
+                animator.SetBool("isWalking", false);
+            }
+            else
+            {
+                StartCoroutine(EsperarNoDestino());
+            }
+            podeMover = false;
+        }
+    }
+
+    private void GirarParaOlhar(Transform target)
+    {
+        if (target != null)
+        {
+            Vector3 direction = target.position - transform.position;
+            direction.y = 0;
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+    }
+
+    private void ResetarCliente()
+    {
+        chatBubble.SetTempo(0);
+        DestivarFilhoPorTag();
+        noPontoC = false;
+        podeMover = true;
+        animator.SetBool("isWalking", true);
+
+        destinoAtual = (Random.value < 0.5f) ? pontoA : pontoB;
+    }
+
     IEnumerator EsperarNoDestino()
     {
-        // Atualiza o parâmetro do Animator para "idle"
         animator.SetBool("isWalking", false);
+        yield return new WaitForSeconds(3.0f);
 
-        // Espera por um tempo aleatório entre 1 e 5 segundos
-        float tempoDeEspera = 3.0f;
-        yield return new WaitForSeconds(tempoDeEspera);
-
-        // Decide o próximo destino: chance de ir para o ponto C
-        float chanceIrParaPontoC = 0.3f; // 30% de chance de ir para o ponto C
-        if (Random.value < chanceIrParaPontoC)
+        if (Random.value < 0.8f)
         {
             destinoAtual = pontoC;
         }
         else
         {
-            // Alterna entre o ponto A e B
             destinoAtual = (destinoAtual == pontoA) ? pontoB : pontoA;
         }
 
-        // Define que o personagem pode se mover novamente
         podeMover = true;
     }
-}
 
+    private void AtivarFilhoPorTag()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.CompareTag(tagDoFilho))
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private void DestivarFilhoPorTag()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.CompareTag(tagDoFilho))
+            {
+                child.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    
+}

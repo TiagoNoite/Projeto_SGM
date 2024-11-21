@@ -20,15 +20,18 @@ public class encher : MonoBehaviour
         alturaInicial = 0;
     }
 
-    void Update()
+   void Update()
     {
         // Se o copo estiver enchendo e ainda não atingiu a altura máxima
         if (enchendo && (transform.localScale.y < alturaInicial + alturaMaxima))
         {
-            Debug.Log("taaaaaaaaaaaaaaaaaa");
             transform.localScale += new Vector3(0, velocidadeEnchimento * Time.deltaTime, 0);
-            // Aumenta a posição no eixo Y para simular o enchimento para cima
             transform.localPosition += new Vector3(0, 0, velocidadeEnchimento * Time.deltaTime);
+        }
+        else if (enchendo)
+        {
+            Debug.Log("Copo cheio!");
+            enchendo = false; // Evita loops infinitos
         }
     }
 

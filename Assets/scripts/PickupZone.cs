@@ -4,33 +4,75 @@ using UnityEngine;
 
 public class PickupZone : MonoBehaviour
 {
+    // Referência ao componente ChatBubble
+    private ChatBubble chatBubble;
+    public float time_given =3f;
+
+    // Lista para rastrear os itens entregues
+    private List<string> deliveredItems = new List<string>();
+
+    private void Start()
+    {
+        // Busca o componente ChatBubble na mesma GameObject ou em outro local
+        chatBubble = FindObjectOfType<ChatBubble>();
+        if (chatBubble == null)
+        {
+            Debug.LogError("ChatBubble não encontrado na cena!");
+        }
+    }
+
     // Este método é chamado quando um objeto entra no trigger
     private void OnTriggerEnter(Collider other)
     {
-        // Verifica se o objeto que entrou é o que você quer detectar
-        if (other.CompareTag("Pickup"))
+        if (chatBubble == null) return;
+
+        // Obtém as tags esperadas
+        List<string> expectedTags = chatBubble.GetRequestedItems();
+
+        // Verifica se a tag do objeto está na lista de tags esperadas
+        if (expectedTags.Contains(other.tag))
         {
-            Debug.Log("Objeto entrou na zona de pickup: " + other.name);
-            // Aqui você pode adicionar a lógica para pegar o objeto
-            PegarObjeto(other.gameObject);
+            Debug.Log($"Item correto entregue: {other.name} ({other.tag})");
+            if (!deliveredItems.Contains(other.tag))
+            {
+                deliveredItems.Add(other.tag);
+                Debug.Log($"Item {other.tag} foi registrado como entregue.");
+            }
+
+            // Desativa o objeto como se tivesse sido entregue
+            other.gameObject.SetActive(false);
+
+            // Verifica se todos os itens foram entregues
+            if (AllItemsDelivered(expectedTags))
+            {
+                StartCoroutine(ProcessDelivery());
+            }
+        }
+        else
+        {
+            Debug.Log($"Item incorreto entregue: {other.name} ({other.tag})");
         }
     }
 
-    // Este método é chamado quando um objeto sai do trigger
-    private void OnTriggerExit(Collider other)
+    // Método para verificar se todos os itens foram entregues
+    private bool AllItemsDelivered(List<string> expectedTags)
     {
-        if (other.CompareTag("Pickup"))
+        foreach (string tag in expectedTags)
         {
-            Debug.Log("Objeto saiu da zona de pickup: " + other.name);
+            if (!deliveredItems.Contains(tag))
+            {
+                return false;
+            }
         }
+        return true;
     }
 
-    // Função para lidar com a lógica de pegar o objeto
-    private void PegarObjeto(GameObject objeto)
+    // Coroutine para processar o tempo de espera antes de finalizar a entrega
+    private IEnumerator ProcessDelivery()
     {
-        // Adicione aqui o que você quer fazer quando o objeto for pego
-        // Por exemplo, desativar o objeto ou movê-lo para outra posição
-        objeto.SetActive(false);
-        Debug.Log("Objeto foi pego: " + objeto.name);
+        Debug.Log("Todos os itens entregues! Processando...");
+        yield return new WaitForSeconds(time_given); // Tempo de espera de 3 segundos
+        Debug.Log("Entrega concluída! Pedido completo.");
+        deliveredItems.Clear(); // Reseta a lista para o próximo pedido
     }
 }

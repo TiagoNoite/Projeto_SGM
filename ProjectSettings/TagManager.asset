@@ -7,6 +7,15 @@ TagManager:
   - Anchor
   - Pickup
   - copo
+  - caco
+  - beer
+  - Trigger
+  - meat
+  - carne
+  - chat
+  - timer
+  - slicedmeat
+  - can
   layers:
   - Default
   - TransparentFX
