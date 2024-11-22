@@ -6,12 +6,13 @@ public class ChatBubble : MonoBehaviour
 {
     public Color corInicial = Color.green;
     public Color corFinal = Color.red;
-    public float duracao = 20.0f;
+    public float duracao = 30.0f;
     private float tempo = 0f;
 
     private Dictionary<string, List<string>> foodRequests = new Dictionary<string, List<string>>
     {
         { "passa me uma cerverja", new List<string> { "beer" } },
+        { "corta me ai uns bocados de carne para comer", new List<string> { "carne" } },
         { "cota me ai uns bocados de carne para comer", new List<string> { "carne" } },
         { "tem bolo do caco?", new List<string> { "caco" } },
         { "ha para ai ainda cerveja?", new List<string> { "beer" } },
@@ -95,6 +96,15 @@ public class ChatBubble : MonoBehaviour
     public void SetTempo(float time)
     {
         tempo = time;
+    }
+
+    public void SetDuraçao(float time)
+    {
+        if(duracao>20){
+            duracao =duracao- time;
+            Debug.Log("a duraçao ta a "+duracao);
+        }
+        
     }
 
     private string GetRandomRequest()

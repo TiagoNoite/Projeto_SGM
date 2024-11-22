@@ -6,6 +6,10 @@ public class PickupZone : MonoBehaviour
 {
     // Referência ao componente ChatBubble
     private ChatBubble chatBubble;
+
+     private ScoreManager ScoreManager;
+    
+     private MovimentoAleatorio MovimentoAleatorio;
     public float time_given =3f;
 
     // Lista para rastrear os itens entregues
@@ -15,7 +19,19 @@ public class PickupZone : MonoBehaviour
     {
         // Busca o componente ChatBubble na mesma GameObject ou em outro local
         chatBubble = FindObjectOfType<ChatBubble>();
+        
         if (chatBubble == null)
+        {
+            Debug.LogError("ChatBubble não encontrado na cena!");
+        }
+        MovimentoAleatorio = FindObjectOfType<MovimentoAleatorio>();
+        if (MovimentoAleatorio == null)
+        {
+            Debug.LogError("ChatBubble não encontrado na cena!");
+        }
+
+        ScoreManager = FindObjectOfType<ScoreManager>();
+        if (ScoreManager == null)
         {
             Debug.LogError("ChatBubble não encontrado na cena!");
         }
@@ -36,6 +52,7 @@ public class PickupZone : MonoBehaviour
             if (!deliveredItems.Contains(other.tag))
             {
                 deliveredItems.Add(other.tag);
+                ScoreManager.sethighscore(100f);
                 Debug.Log($"Item {other.tag} foi registrado como entregue.");
             }
 
@@ -70,9 +87,11 @@ public class PickupZone : MonoBehaviour
     // Coroutine para processar o tempo de espera antes de finalizar a entrega
     private IEnumerator ProcessDelivery()
     {
-        Debug.Log("Todos os itens entregues! Processando...");
         yield return new WaitForSeconds(time_given); // Tempo de espera de 3 segundos
         Debug.Log("Entrega concluída! Pedido completo.");
+        chatBubble.SetTempo(100f);
+        chatBubble.SetDuraçao(0.3f);
+        MovimentoAleatorio.SetGoPointC(0.01f);
         deliveredItems.Clear(); // Reseta a lista para o próximo pedido
     }
 }

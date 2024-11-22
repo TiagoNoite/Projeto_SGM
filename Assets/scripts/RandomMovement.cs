@@ -14,6 +14,8 @@ public class MovimentoAleatorio : MonoBehaviour
     private bool podeMover = false;
     public string tagDoFilho = "chat";
 
+    private float GoPointC=0.30f;
+
     private Animator animator;
     private ChatBubble chatBubble;
 
@@ -47,7 +49,6 @@ public class MovimentoAleatorio : MonoBehaviour
 
             if (chatBubble.GetTempo() >= chatBubble.Getduracao())
             {
-                Debug.Log("passou por aqui e vai sair so pode apareceu um ");
                 ResetarCliente();
             }
         }
@@ -107,7 +108,7 @@ public class MovimentoAleatorio : MonoBehaviour
         animator.SetBool("isWalking", false);
         yield return new WaitForSeconds(3.0f);
 
-        if (Random.value < 0.8f)
+        if (Random.value < GoPointC)
         {
             destinoAtual = pontoC;
         }
@@ -141,5 +142,10 @@ public class MovimentoAleatorio : MonoBehaviour
         }
     }
 
-    
+    public void SetGoPointC(float value){
+         if(GoPointC<50){
+            GoPointC = GoPointC + value;
+            Debug.Log("A rpobabildade ta a  " + GoPointC);
+        }
+    }
 }
