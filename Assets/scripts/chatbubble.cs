@@ -44,7 +44,7 @@ public class ChatBubble : MonoBehaviour
     private void Update()
     {
 
-        if (tempo <= duracao)
+        if (tempo < duracao)
         {
             tempo += Time.deltaTime;
             iconSpriteRenderer.color = Color.Lerp(corInicial, corFinal, tempo / duracao);
@@ -52,13 +52,19 @@ public class ChatBubble : MonoBehaviour
         else
         {
             iconSpriteRenderer.color = corFinal;
+           
+        }
+
+        if(tempo >= duracao-0.1 )
+        {
             newRequestNeeded = true;
             Debug.Log("new request ta a true");
         }
+       
 
         if (newRequestNeeded)
         {
-            Debug.Log("ola chegou aqui");
+            Debug.Log("chegou aqui ao if");
             GenerateNewRequest();
             newRequestNeeded = false;
         }
@@ -73,7 +79,7 @@ public class ChatBubble : MonoBehaviour
             newRequest = GetRandomRequest();
         } while (newRequest == lastRequest); // Evita repetição imediata
 
-        Debug.Log("ola chegou ao GenerateNewRequest");
+        Debug.Log(" chegou ao GenerateNewRequest");
         lastRequest = newRequest; // Atualiza o último pedido
         currentRequest = newRequest;
         currentTags = foodRequests[newRequest];
@@ -82,7 +88,7 @@ public class ChatBubble : MonoBehaviour
         textMeshPro = transform.Find("Text (TMP)").GetComponent<TextMeshPro>();
 
         Setup(newRequest);
-        tempo = 0; // Reseta o tempo
+       
     }
 
     private void Setup(string text)

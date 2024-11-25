@@ -107,7 +107,7 @@ public class PickupZone : MonoBehaviour
         Debug.Log("Entrega concluída! Pedido completo.");
         chatBubble.SetTempo(100f);
         chatBubble.SetDuracao(0.3f);
-        MovimentoAleatorio.SetGoPointC(0.01f);
+        MovimentoAleatorio.SetGoPointC(0.03f);
         deliveredItems.Clear(); // Reseta a lista para o próximo pedido
     }
 

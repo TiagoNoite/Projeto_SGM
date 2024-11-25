@@ -14,7 +14,7 @@ public class MovimentoAleatorio : MonoBehaviour
     private bool podeMover = false;
     public string tagDoFilho = "chat";
 
-    private float GoPointC=0.70f;
+    private float GoPointC=0.40f;
 
     private Animator animator;
     private ChatBubble chatBubble;
@@ -143,7 +143,7 @@ public class MovimentoAleatorio : MonoBehaviour
     }
 
     public void SetGoPointC(float value){
-         if(GoPointC<50){
+         if(GoPointC<70){
             GoPointC = GoPointC + value;
             Debug.Log("A rpobabildade ta a  " + GoPointC);
         }
