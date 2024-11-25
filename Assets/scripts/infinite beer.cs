@@ -35,13 +35,13 @@ public class InfiniteBeer : MonoBehaviour
     if (objetosNoTrigger.Contains(other.gameObject))
     {
         objetosNoTrigger.Remove(other.gameObject);
-        Debug.Log($"Objeto removido: {other.name}");
+       
     }
 
     // Inicia a rotina de criação apenas se não houver objetos restantes
     if (objetosNoTrigger.Count == 0 && !spawnBloqueado)
     {
-        Debug.Log("Nenhum objeto no trigger. Criando novo copo...");
+        
         StartCoroutine(CriarObjetoSeVazio());
     }
 }

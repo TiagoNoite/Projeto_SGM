@@ -14,7 +14,7 @@ public class MovimentoAleatorio : MonoBehaviour
     private bool podeMover = false;
     public string tagDoFilho = "chat";
 
-    private float GoPointC=0.30f;
+    private float GoPointC=0.70f;
 
     private Animator animator;
     private ChatBubble chatBubble;
@@ -47,7 +47,7 @@ public class MovimentoAleatorio : MonoBehaviour
 
             GirarParaOlhar(looking);
 
-            if (chatBubble.GetTempo() >= chatBubble.Getduracao())
+            if (chatBubble.GetTempo() >= chatBubble.GetDuracao())
             {
                 ResetarCliente();
             }

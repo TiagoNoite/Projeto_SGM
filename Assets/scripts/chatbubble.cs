@@ -12,19 +12,21 @@ public class ChatBubble : MonoBehaviour
     private Dictionary<string, List<string>> foodRequests = new Dictionary<string, List<string>>
     {
         { "passa me uma cerverja", new List<string> { "beer" } },
-        { "corta me ai uns bocados de carne para comer", new List<string> { "carne" } },
-        { "cota me ai uns bocados de carne para comer", new List<string> { "carne" } },
+        { "corta me ai uns bocados de carne para comer", new List<string> { "carne_sliced" } },
         { "tem bolo do caco?", new List<string> { "caco" } },
         { "ha para ai ainda cerveja?", new List<string> { "beer" } },
         { "ha poncha?", new List<string> { "copo" } },
-        { "quero carne e um bolo no caco", new List<string> { "caco", "carne" } }
+        { "ha algum sumo?", new List<string> { "can" } },
+        { "quero carne e um bolo no caco", new List<string> { "caco", "carne_sliced" } }
     };
 
     private SpriteRenderer iconSpriteRenderer;
     private TextMeshPro textMeshPro;
-    private string randomRequest;
+    private string currentRequest;
     private List<string> currentTags;
-    private bool newfrase= false;
+    private bool newRequestNeeded = false;
+
+    private string lastRequest;
 
     private void Awake()
     {
@@ -35,17 +37,14 @@ public class ChatBubble : MonoBehaviour
     private void Start()
     {
         iconSpriteRenderer.color = corInicial;
-        randomRequest = GetRandomRequest();
-        currentTags = foodRequests[randomRequest];
-        Setup(randomRequest);
-        newfrase= false;
+        GenerateNewRequest();
+        newRequestNeeded = true;
     }
 
-
-    void Update()
+    private void Update()
     {
-        
-        if (tempo < duracao)
+
+        if (tempo <= duracao)
         {
             tempo += Time.deltaTime;
             iconSpriteRenderer.color = Color.Lerp(corInicial, corFinal, tempo / duracao);
@@ -53,20 +52,38 @@ public class ChatBubble : MonoBehaviour
         else
         {
             iconSpriteRenderer.color = corFinal;
+            newRequestNeeded = true;
+            Debug.Log("new request ta a true");
         }
-        if(newfrase){
-            Reconfiguerfrase();
-            newfrase=false;
+
+        if (newRequestNeeded)
+        {
+            Debug.Log("ola chegou aqui");
+            GenerateNewRequest();
+            newRequestNeeded = false;
         }
-        
     }
 
-    private void Reconfiguerfrase(){
+    private void GenerateNewRequest()
+    {
+        // Gera um novo pedido aleatório
+        string newRequest;
+        do
+        {
+            newRequest = GetRandomRequest();
+        } while (newRequest == lastRequest); // Evita repetição imediata
 
-        randomRequest = GetRandomRequest();
-        currentTags = foodRequests[randomRequest];
-        Setup(randomRequest);
-    } 
+        Debug.Log("ola chegou ao GenerateNewRequest");
+        lastRequest = newRequest; // Atualiza o último pedido
+        currentRequest = newRequest;
+        currentTags = foodRequests[newRequest];
+
+        
+        textMeshPro = transform.Find("Text (TMP)").GetComponent<TextMeshPro>();
+
+        Setup(newRequest);
+        tempo = 0; // Reseta o tempo
+    }
 
     private void Setup(string text)
     {
@@ -80,7 +97,7 @@ public class ChatBubble : MonoBehaviour
 
     public string GetRequestText()
     {
-        return randomRequest;
+        return currentRequest;
     }
 
     public float GetTempo()
@@ -88,7 +105,7 @@ public class ChatBubble : MonoBehaviour
         return tempo;
     }
 
-    public float Getduracao()
+    public float GetDuracao()
     {
         return duracao;
     }
@@ -98,27 +115,19 @@ public class ChatBubble : MonoBehaviour
         tempo = time;
     }
 
-    public void SetDuraçao(float time)
+    public void SetDuracao(float time)
     {
-        if(duracao>20){
-            duracao =duracao- time;
-            Debug.Log("a duraçao ta a "+duracao);
+        if (duracao > 20)
+        {
+            duracao -= time;
+            Debug.Log("Nova duração: " + duracao);
         }
-        
     }
 
     private string GetRandomRequest()
     {
         List<string> keys = new List<string>(foodRequests.Keys);
-
-        // Gerar uma semente única com base no tempo e ID do objeto
-        int seed = System.DateTime.Now.Millisecond + gameObject.GetInstanceID();
-        System.Random random = new System.Random(seed);
-
-        int randomIndex = random.Next(0, keys.Count);
+        int randomIndex = Random.Range(0, keys.Count);
         return keys[randomIndex];
-    }
-    public void Setnewfrase(bool value){
-        newfrase=value;
     }
 }

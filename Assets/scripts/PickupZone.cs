@@ -7,33 +7,45 @@ public class PickupZone : MonoBehaviour
     // Referência ao componente ChatBubble
     private ChatBubble chatBubble;
 
-     private ScoreManager ScoreManager;
-    
-     private MovimentoAleatorio MovimentoAleatorio;
-    public float time_given =3f;
+    private ScoreManager ScoreManager;
+    private MovimentoAleatorio MovimentoAleatorio;
+    public float time_given = 3f;
 
     // Lista para rastrear os itens entregues
     private List<string> deliveredItems = new List<string>();
+
+    // Referência para o componente AudioSource
+    public AudioSource audioSource;
+
+    // Som para quando o item é recebido corretamente
+    public AudioClip itemReceivedSound;
 
     private void Start()
     {
         // Busca o componente ChatBubble na mesma GameObject ou em outro local
         chatBubble = FindObjectOfType<ChatBubble>();
-        
+
         if (chatBubble == null)
         {
             Debug.LogError("ChatBubble não encontrado na cena!");
         }
+
         MovimentoAleatorio = FindObjectOfType<MovimentoAleatorio>();
         if (MovimentoAleatorio == null)
         {
-            Debug.LogError("ChatBubble não encontrado na cena!");
+            Debug.LogError("MovimentoAleatorio não encontrado na cena!");
         }
 
         ScoreManager = FindObjectOfType<ScoreManager>();
         if (ScoreManager == null)
         {
-            Debug.LogError("ChatBubble não encontrado na cena!");
+            Debug.LogError("ScoreManager não encontrado na cena!");
+        }
+
+        // Certifica-se de que há um AudioSource
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource não está configurado! Por favor, atribua um no Inspector.");
         }
     }
 
@@ -53,7 +65,11 @@ public class PickupZone : MonoBehaviour
             {
                 deliveredItems.Add(other.tag);
                 ScoreManager.sethighscore(100f);
+                PlayItemReceivedSound();
                 Debug.Log($"Item {other.tag} foi registrado como entregue.");
+
+                // Toca o som de item recebido
+                
             }
 
             // Desativa o objeto como se tivesse sido entregue
@@ -90,8 +106,21 @@ public class PickupZone : MonoBehaviour
         yield return new WaitForSeconds(time_given); // Tempo de espera de 3 segundos
         Debug.Log("Entrega concluída! Pedido completo.");
         chatBubble.SetTempo(100f);
-        chatBubble.SetDuraçao(0.3f);
+        chatBubble.SetDuracao(0.3f);
         MovimentoAleatorio.SetGoPointC(0.01f);
         deliveredItems.Clear(); // Reseta a lista para o próximo pedido
+    }
+
+    // Método para tocar o som de item recebido
+    private void PlayItemReceivedSound()
+    {
+        if (audioSource != null && itemReceivedSound != null)
+        {
+            audioSource.PlayOneShot(itemReceivedSound);
+        }
+        else
+        {
+            Debug.LogWarning("AudioSource ou itemReceivedSound não configurados!");
+        }
     }
 }
