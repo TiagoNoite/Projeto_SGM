@@ -4,82 +4,61 @@ using UnityEngine;
 
 public class PickupZone : MonoBehaviour
 {
-    // Referência ao componente ChatBubble
     private ChatBubble chatBubble;
-
-    private ScoreManager ScoreManager;
-    private MovimentoAleatorio MovimentoAleatorio;
+    private ScoreManager scoreManager;
+    private MovimentoAleatorio movimentoAleatorio;
     public float time_given = 3f;
 
-    // Lista para rastrear os itens entregues
-    private List<string> deliveredItems = new List<string>();
+    // Rastreamento do item entregue
+    private string deliveredItem = null;
 
-    // Referência para o componente AudioSource
     public AudioSource audioSource;
-
-    // Som para quando o item é recebido corretamente
     public AudioClip itemReceivedSound;
 
     private void Start()
     {
-        // Busca o componente ChatBubble na mesma GameObject ou em outro local
         chatBubble = FindObjectOfType<ChatBubble>();
-
         if (chatBubble == null)
-        {
             Debug.LogError("ChatBubble não encontrado na cena!");
-        }
 
-        MovimentoAleatorio = FindObjectOfType<MovimentoAleatorio>();
-        if (MovimentoAleatorio == null)
-        {
+        movimentoAleatorio = FindObjectOfType<MovimentoAleatorio>();
+        if (movimentoAleatorio == null)
             Debug.LogError("MovimentoAleatorio não encontrado na cena!");
-        }
 
-        ScoreManager = FindObjectOfType<ScoreManager>();
-        if (ScoreManager == null)
-        {
+        scoreManager = FindObjectOfType<ScoreManager>();
+        if (scoreManager == null)
             Debug.LogError("ScoreManager não encontrado na cena!");
-        }
 
-        // Certifica-se de que há um AudioSource
         if (audioSource == null)
-        {
-            Debug.LogError("AudioSource não está configurado! Por favor, atribua um no Inspector.");
-        }
+            Debug.LogError("AudioSource não configurado!");
     }
 
-    // Este método é chamado quando um objeto entra no trigger
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Item entrou no collider.");
         if (chatBubble == null) return;
 
-        // Obtém as tags esperadas
-        List<string> expectedTags = chatBubble.GetRequestedItems();
+        // Obtém o item esperado
+        string expectedItem = chatBubble.GetRequestedItem();
+        Debug.Log($"Item esperado: {expectedItem}, Item recebido: {other.tag}");
 
-        // Verifica se a tag do objeto está na lista de tags esperadas
-        if (expectedTags.Contains(other.tag))
+        // Verifica se o item recebido é o esperado
+        if (expectedItem == other.tag)
         {
             Debug.Log($"Item correto entregue: {other.name} ({other.tag})");
-            if (!deliveredItems.Contains(other.tag))
+
+            if (deliveredItem != other.tag) // Verifica se o item já não foi entregue
             {
-                deliveredItems.Add(other.tag);
-                ScoreManager.sethighscore(100f);
+                deliveredItem = other.tag;
+                scoreManager.sethighscore(100f);
                 PlayItemReceivedSound();
                 Debug.Log($"Item {other.tag} foi registrado como entregue.");
-
-                // Toca o som de item recebido
-                
             }
 
-            // Desativa o objeto como se tivesse sido entregue
-            other.gameObject.SetActive(false);
+            other.gameObject.SetActive(false); // Desativa o objeto entregue
 
-            // Verifica se todos os itens foram entregues
-            if (AllItemsDelivered(expectedTags))
-            {
-                StartCoroutine(ProcessDelivery());
-            }
+            // Processa a entrega
+            StartCoroutine(ProcessDelivery());
         }
         else
         {
@@ -87,31 +66,16 @@ public class PickupZone : MonoBehaviour
         }
     }
 
-    // Método para verificar se todos os itens foram entregues
-    private bool AllItemsDelivered(List<string> expectedTags)
-    {
-        foreach (string tag in expectedTags)
-        {
-            if (!deliveredItems.Contains(tag))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Coroutine para processar o tempo de espera antes de finalizar a entrega
     private IEnumerator ProcessDelivery()
     {
-        yield return new WaitForSeconds(time_given); // Tempo de espera de 3 segundos
+        yield return new WaitForSeconds(time_given);
         Debug.Log("Entrega concluída! Pedido completo.");
         chatBubble.SetTempo(100f);
         chatBubble.SetDuracao(0.3f);
-        MovimentoAleatorio.SetGoPointC(0.03f);
-        deliveredItems.Clear(); // Reseta a lista para o próximo pedido
+        movimentoAleatorio.SetGoPointC(0.03f);
+        deliveredItem = null; // Reseta o item para o próximo pedido
     }
 
-    // Método para tocar o som de item recebido
     private void PlayItemReceivedSound()
     {
         if (audioSource != null && itemReceivedSound != null)

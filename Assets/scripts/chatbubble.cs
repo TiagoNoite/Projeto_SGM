@@ -9,24 +9,23 @@ public class ChatBubble : MonoBehaviour
     public float duracao = 30.0f;
     private float tempo = 0f;
 
-    private Dictionary<string, List<string>> foodRequests = new Dictionary<string, List<string>>
+    private Dictionary<string, string> foodRequests = new Dictionary<string, string>
     {
-        { "passa me uma cerverja", new List<string> { "beer" } },
-        { "corta me ai uns bocados de carne para comer", new List<string> { "carne_sliced" } },
-        { "tem bolo do caco?", new List<string> { "caco" } },
-        { "ha para ai ainda cerveja?", new List<string> { "beer" } },
-        { "ha poncha?", new List<string> { "copo" } },
-        { "ha algum sumo?", new List<string> { "can" } },
-        { "quero carne e um bolo no caco", new List<string> { "caco", "carne_sliced" } }
+        { "passa me uma cerverja", "beer" },
+        { "corta me ai uns bocados de carne", "carne_sliced" },
+        { "tem bolo do caco?", "caco" },
+        { "ha para ai ainda cerveja?", "beer" },
+        { "ha poncha?", "copo" },
+        { "ha algum sumo?", "can" },
+        { "tem para ai carne ainda", "carne_sliced" },
+        { "quero um bolo no caco", "caco" }
     };
 
     private SpriteRenderer iconSpriteRenderer;
     private TextMeshPro textMeshPro;
-    private string currentRequest;
-    private List<string> currentTags;
+    private string currentRequest; // Agora é string
+    private string currentTags; // Agora é string
     private bool newRequestNeeded = false;
-
-    private string lastRequest;
 
     private void Awake()
     {
@@ -43,7 +42,6 @@ public class ChatBubble : MonoBehaviour
 
     private void Update()
     {
-
         if (tempo < duracao)
         {
             tempo += Time.deltaTime;
@@ -52,15 +50,13 @@ public class ChatBubble : MonoBehaviour
         else
         {
             iconSpriteRenderer.color = corFinal;
-           
         }
 
-        if(tempo >= duracao-0.1 )
+        if (tempo >= duracao - 0.1f)
         {
             newRequestNeeded = true;
             Debug.Log("new request ta a true");
         }
-       
 
         if (newRequestNeeded)
         {
@@ -72,23 +68,11 @@ public class ChatBubble : MonoBehaviour
 
     private void GenerateNewRequest()
     {
-        // Gera um novo pedido aleatório
-        string newRequest;
-        do
-        {
-            newRequest = GetRandomRequest();
-        } while (newRequest == lastRequest); // Evita repetição imediata
+        string newRequest = GetRandomRequest(); // Obtém uma chave aleatória
+        currentRequest = newRequest; // Atualiza o pedido atual
+        currentTags = foodRequests[newRequest]; // Obtém o valor associado
 
-        Debug.Log(" chegou ao GenerateNewRequest");
-        lastRequest = newRequest; // Atualiza o último pedido
-        currentRequest = newRequest;
-        currentTags = foodRequests[newRequest];
-
-        
-        textMeshPro = transform.Find("Text (TMP)").GetComponent<TextMeshPro>();
-
-        Setup(newRequest);
-       
+        Setup(newRequest); // Passa o texto para exibição
     }
 
     private void Setup(string text)
@@ -96,14 +80,14 @@ public class ChatBubble : MonoBehaviour
         textMeshPro.SetText(text);
     }
 
-    public List<string> GetRequestedItems()
+    public string GetRequestedItem()
     {
-        return currentTags;
+        return currentTags; // Retorna o item atual
     }
 
     public string GetRequestText()
     {
-        return currentRequest;
+        return currentRequest; // Retorna o texto do pedido
     }
 
     public float GetTempo()
@@ -132,8 +116,8 @@ public class ChatBubble : MonoBehaviour
 
     private string GetRandomRequest()
     {
-        List<string> keys = new List<string>(foodRequests.Keys);
+        List<string> keys = new List<string>(foodRequests.Keys); // Obtém todas as chaves
         int randomIndex = Random.Range(0, keys.Count);
-        return keys[randomIndex];
+        return keys[randomIndex]; // Retorna uma chave aleatória
     }
 }
