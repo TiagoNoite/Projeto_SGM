@@ -60,6 +60,7 @@ public class ChatBubble : MonoBehaviour
 
         if (newRequestNeeded)
         {
+            
             Debug.Log("chegou aqui ao if");
             GenerateNewRequest();
             newRequestNeeded = false;

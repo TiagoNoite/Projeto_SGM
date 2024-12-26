@@ -10,9 +10,14 @@ public class Timer : MonoBehaviour
     public TextMeshPro timerText; // Referência ao TextMeshPro para exibir o tempo
 
     private float currentTime;
+    private ScoreManager score;
 
     void Start()
     {
+         score = FindObjectOfType<ScoreManager>();
+        if (score == null){
+            Debug.LogError("score não encontrado na cena!");
+        }
         // Inicializa o tempo atual com o tempo definido
         currentTime = timeToMenu;
 
@@ -30,7 +35,8 @@ public class Timer : MonoBehaviour
             // Atualiza o texto do timer no TextMeshPro
             int minutes = Mathf.FloorToInt(currentTime / 60);
             int seconds = Mathf.FloorToInt(currentTime % 60);
-            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            timerText.text = string.Format("{0:00}:{1:00} \\ Points: {2}", minutes, seconds, score.Gethighscore());
+
         }
     }
 

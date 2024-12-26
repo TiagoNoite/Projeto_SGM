@@ -29,7 +29,7 @@ public class heightCheck : MonoBehaviour
         if (transform.position.y < alturaMinima)
         {
             Debug.Log("asdasdasd");
-            if (minhaTag=="copo" || minhaTag=="beer" || minhaTag=="caco"|| minhaTag=="carne" || minhaTag=="can")
+            if (minhaTag=="copo_vazio" || minhaTag=="beer" || minhaTag=="caco_cozido"|| minhaTag=="carne" || minhaTag=="can" || minhaTag=="carne_sliced") 
             {
                 // Destroi o objeto se a tag for "Destruir"
                 Debug.Log($"{gameObject.name} foi destruído por cair abaixo da altura mínima.");

@@ -17,6 +17,8 @@ TagManager:
   - slicedmeat
   - can
   - carne_sliced
+  - caco_cozido
+  - copo_vazio
   layers:
   - Default
   - TransparentFX

@@ -15,10 +15,11 @@ public class RotationBasedTrigger : MonoBehaviour
     {
         // Obter a rotação do objeto em ângulos de Euler
         Vector3 rotacaoAtual = transform.eulerAngles;
-
-        // Verificar se a rotação no eixo Y está dentro do intervalo
+      
+        // Verificar se a rotação no eixo X está dentro do intervalo
         if (rotacaoAtual.x <= anguloMinimo && rotacaoAtual.x >= anguloMaximo)
         {
+        
             // Ativar o Collider se a rotação estiver no intervalo
             if (!collisionBoxTrigger.enabled)
             {

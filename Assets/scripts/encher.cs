@@ -10,7 +10,7 @@ public class encher : MonoBehaviour
 
     // Altura inicial do líquido
     private float alturaInicial;
-
+    private float alturaEnchendo;
     // Variável para controlar o enchimento
     private bool enchendo = false;
 
@@ -26,10 +26,12 @@ public class encher : MonoBehaviour
         if (enchendo && (transform.localScale.y < alturaInicial + alturaMaxima))
         {
             transform.localScale += new Vector3(0, velocidadeEnchimento * Time.deltaTime, 0);
+           
             transform.localPosition += new Vector3(0, 0, velocidadeEnchimento * Time.deltaTime);
         }
         else if (enchendo)
         {
+            alturaEnchendo=1.7f;
             Debug.Log("Copo cheio!");
             enchendo = false; // Evita loops infinitos
         }
@@ -45,5 +47,9 @@ public class encher : MonoBehaviour
     public void PararEnchimento()
     {
         enchendo = false;
+    }
+
+    public float GetAlturaInicial(){
+        return alturaEnchendo;
     }
 }
